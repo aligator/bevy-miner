@@ -9,20 +9,42 @@ pub struct MainWorld;
 
 impl VoxelWorldConfig for MainWorld {
     fn spawning_distance(&self) -> u32 {
-        10
+        20
     }
 
     fn voxel_lookup_delegate(&self) -> VoxelLookupDelegate {
-        Box::new(move |_chunk_pos| get_voxel_fn())
+        Box::new(move |_chunk_pos| get_voxel_fn(false))
     }
 }
+
+#[derive(Resource, Clone, Default)]
+pub struct PhysicWorld;
+
+impl VoxelWorldConfig for PhysicWorld {
+    fn spawning_distance(&self) -> u32 {
+        5
+    }
+
+    fn voxel_lookup_delegate(&self) -> VoxelLookupDelegate {
+        Box::new(move |_chunk_pos| get_voxel_fn(true))
+    }
+}
+
 pub struct MapPlugin;
 impl Plugin for MapPlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugins(VoxelWorldPlugin::with_config(MainWorld));
+        app.add_plugins(VoxelWorldPlugin::with_config(MainWorld))
+            .add_plugins(VoxelWorldPlugin::with_config(PhysicWorld));
+          //  .add_systems(Update, hide_physic_world);
         //  .add_systems(Update, set_camera_to_map);
     }
 }
+// 
+// fn hide_physic_world(mut commands: Commands, new_chunks: Query<Entity, With<Chunk<MainWorld>>>) {
+//     for entity in new_chunks.iter() {
+//         commands.entity(entity).insert(Visibility::Hidden);
+//     }
+// }
 
 fn set_camera_to_map(
     mut query: Query<&mut Transform, With<VoxelWorldCamera>>,
@@ -42,7 +64,7 @@ fn set_camera_to_map(
     }
 }
 
-fn get_voxel_fn() -> Box<dyn FnMut(IVec3) -> WorldVoxel + Send + Sync> {
+fn get_voxel_fn(filter_non_solid: bool) -> Box<dyn FnMut(IVec3) -> WorldVoxel + Send + Sync> {
     // Set up some noise to use as the terrain height map
     let mut noise = HybridMulti::<Perlin>::new(1234);
     noise.octaves = 5;
@@ -59,6 +81,10 @@ fn get_voxel_fn() -> Box<dyn FnMut(IVec3) -> WorldVoxel + Send + Sync> {
     Box::new(move |pos: IVec3| {
         // Sea level
         if pos.y < 1 {
+            // Filter water as it is not really solid.
+            if filter_non_solid {
+                return WorldVoxel::Air;
+            }
             return WorldVoxel::Solid(3);
         }
 

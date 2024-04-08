@@ -1117,8 +1117,7 @@ dependencies = [
 [[package]]
 name = "bevy_voxel_world"
 version = "0.5.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "27ac90514bd8c0e092f450396975221a496b4cf4b4f555fd5d684c306014f142"
+source = "git+https://github.com/aligator/bevy_voxel_world?branch=multiworld_fixes#f1f14c48cd288b2f48b67b584f79e6dde4769dca"
 dependencies = [
  "bevy",
  "block-mesh",
