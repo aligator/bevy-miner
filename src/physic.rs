@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 use bevy_rapier3d::prelude::*;
-use bevy_voxel_world::prelude::{Chunk, ChunkWillRemesh};
+use bevy_voxel_world::prelude::Chunk;
 
 use crate::map::PhysicWorld;
 
@@ -12,39 +12,20 @@ impl Plugin for PhysicPlugin {
                 gravity: Vec3::new(0.0, -98.0, 0.0),
                 ..Default::default()
             })
-            .add_systems(
-                Update,
-                (
-                    (mark_new_chunks, mark_updated_chunks),
-                    generate_chunk_colliders,
-                )
-                    .chain(),
-            );
-    }
-}
-
-#[derive(Component, Default)]
-struct NeedsColliderUpdate;
-
-fn mark_new_chunks(mut commands: Commands, new_chunk: Query<Entity, Added<Chunk<PhysicWorld>>>) {
-    for entity in new_chunk.iter() {
-        commands.entity(entity).insert(NeedsColliderUpdate);
-    }
-}
-
-fn mark_updated_chunks(mut commands: Commands, mut event_reader: EventReader<ChunkWillRemesh<PhysicWorld>>) {
-    for event in event_reader.read() {
-        commands.entity(event.entity).insert(NeedsColliderUpdate);
+            .add_systems(Update, generate_chunk_colliders);
     }
 }
 
 fn generate_chunk_colliders(
     mut commands: Commands,
-    updated_chunks: Query<(&Handle<Mesh>, Entity), With<NeedsColliderUpdate>>,
+    updated_chunks: Query<
+        (&Handle<Mesh>, Entity),
+        (With<Chunk<PhysicWorld>>, Changed<Handle<Mesh>>),
+    >,
     meshes: Res<Assets<Mesh>>,
 ) {
     for (mesh_handle, entity) in updated_chunks.iter() {
-        commands.entity(entity).remove::<NeedsColliderUpdate>();
+        //  commands.entity(entity).insert(Visibility::Hidden);
 
         let Some(mesh) = meshes.get(mesh_handle) else {
             continue;
