@@ -1117,7 +1117,7 @@ dependencies = [
 [[package]]
 name = "bevy_voxel_world"
 version = "0.5.1"
-source = "git+https://github.com/aligator/bevy_voxel_world?branch=multiworld_fixes#f1f14c48cd288b2f48b67b584f79e6dde4769dca"
+source = "git+https://github.com/aligator/bevy_voxel_world?branch=experiments#e337d74fc59a1f3ea3a3c61c1788f3a127fb31a4"
 dependencies = [
  "bevy",
  "block-mesh",

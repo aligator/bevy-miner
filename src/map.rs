@@ -35,16 +35,9 @@ impl Plugin for MapPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugins(VoxelWorldPlugin::with_config(MainWorld))
             .add_plugins(VoxelWorldPlugin::with_config(PhysicWorld));
-          //  .add_systems(Update, hide_physic_world);
         //  .add_systems(Update, set_camera_to_map);
     }
 }
-// 
-// fn hide_physic_world(mut commands: Commands, new_chunks: Query<Entity, With<Chunk<MainWorld>>>) {
-//     for entity in new_chunks.iter() {
-//         commands.entity(entity).insert(Visibility::Hidden);
-//     }
-// }
 
 fn set_camera_to_map(
     mut query: Query<&mut Transform, With<VoxelWorldCamera>>,

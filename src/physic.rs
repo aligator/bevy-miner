@@ -1,8 +1,8 @@
 use bevy::prelude::*;
 use bevy_rapier3d::prelude::*;
-use bevy_voxel_world::prelude::Chunk;
+use bevy_voxel_world::prelude::{Chunk, ChunkWillRemesh, VoxelWorld};
 
-use crate::map::PhysicWorld;
+use crate::map::{MainWorld, PhysicWorld};
 
 pub struct PhysicPlugin;
 impl Plugin for PhysicPlugin {
@@ -18,14 +18,12 @@ impl Plugin for PhysicPlugin {
 
 fn generate_chunk_colliders(
     mut commands: Commands,
-    updated_chunks: Query<
-        (&Handle<Mesh>, Entity),
-        (With<Chunk<PhysicWorld>>, Changed<Handle<Mesh>>),
-    >,
+    updated_chunks: Query<(&Handle<Mesh>, &Chunk<PhysicWorld>), Changed<Handle<Mesh>>>,
     meshes: Res<Assets<Mesh>>,
+    main_world: VoxelWorld<MainWorld>,
 ) {
-    for (mesh_handle, entity) in updated_chunks.iter() {
-        //  commands.entity(entity).insert(Visibility::Hidden);
+    for (mesh_handle, chunk) in updated_chunks.iter() {
+        commands.entity(chunk.entity).insert(Visibility::Hidden);
 
         let Some(mesh) = meshes.get(mesh_handle) else {
             continue;
@@ -39,6 +37,12 @@ fn generate_chunk_colliders(
             continue;
         };
 
-        commands.entity(entity).insert((RigidBody::Fixed, collider));
+        let Some(main_chunk) = main_world.get_chunk(chunk.position) else {
+            continue;
+        };
+        
+        commands
+            .entity(main_chunk.entity)
+            .insert((RigidBody::Fixed, collider));
     }
 }
