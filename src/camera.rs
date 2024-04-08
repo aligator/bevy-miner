@@ -6,9 +6,8 @@ pub struct CameraPlugin;
 
 impl Plugin for CameraPlugin {
     fn build(&self, app: &mut App) {
-        app
-            .add_systems(PreStartup, setup_camera);
-           // .add_systems(Update, move_camera);
+        app.add_systems(PreStartup, setup_camera)
+            .add_systems(Update, move_camera);
     }
 }
 
@@ -16,7 +15,7 @@ fn setup_camera(mut commands: Commands) {
     // camera
     commands.spawn((
         Camera3dBundle {
-            transform: Transform::from_xyz(-200.0, 10.0, -200.0).looking_at(Vec3::ZERO, Vec3::Y),
+            transform: Transform::from_xyz(-200.0, 150.0, -200.0).looking_at(Vec3::ZERO, Vec3::Y),
             ..default()
         },
         // This tells bevy_voxel_world tos use this cameras transform to calculate spawning area

@@ -5,11 +5,11 @@ use bevy_voxel_world::prelude::*;
 use noise::{HybridMulti, NoiseFn, Perlin};
 
 #[derive(Resource, Clone, Default)]
-struct MainWorld;
+pub struct MainWorld;
 
 impl VoxelWorldConfig for MainWorld {
     fn spawning_distance(&self) -> u32 {
-        25
+        10
     }
 
     fn voxel_lookup_delegate(&self) -> VoxelLookupDelegate {
@@ -19,8 +19,8 @@ impl VoxelWorldConfig for MainWorld {
 pub struct MapPlugin;
 impl Plugin for MapPlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugins(VoxelWorldPlugin::with_config(MainWorld))
-            .add_systems(Update, set_camera_to_map);
+        app.add_plugins(VoxelWorldPlugin::with_config(MainWorld));
+        //  .add_systems(Update, set_camera_to_map);
     }
 }
 

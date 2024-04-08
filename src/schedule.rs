@@ -16,18 +16,11 @@ impl Plugin for SchedulePlugin {
             Update,
             (
                 InGameSet::DespawnEntities,
-                // Flush commands (i.e. 'apply_deferred' runs)
                 InGameSet::UserInput,
                 InGameSet::EntityUpdates,
                 InGameSet::CollisionDetection,
             )
                 .chain(), //.run_if(in_state(GameState::InGame)),
-        )
-        .add_systems(
-            Update,
-            apply_deferred
-                .after(InGameSet::DespawnEntities)
-                .before(InGameSet::UserInput),
         );
     }
 }
