@@ -14,9 +14,6 @@ bevy_voxel_world = { git = "https://github.com/aligator/bevy_voxel_world", branc
 noise = "0.9.0"
 bevy-fps-counter = "0.4.0"
 
-[patch.crates-io]
-bevy_ecs_tilemap = { git = "https://github.com/StarArawn/bevy_ecs_tilemap" }
-
 [profile.dev]
 opt-level = 1
 
