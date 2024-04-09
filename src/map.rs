@@ -47,7 +47,7 @@ impl Plugin for MapPlugin {
 // }
 
 fn set_camera_to_map(
-    mut query: Query<&mut Transform, With<VoxelWorldCamera>>,
+    mut query: Query<&mut Transform, With<VoxelWorldCamera<MainWorld>>>,
     voxel_world: VoxelWorld<MainWorld>,
 ) {
     for mut transform in query.iter_mut() {
