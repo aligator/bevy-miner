@@ -1,5 +1,4 @@
-use bevy::pbr::CascadeShadowConfigBuilder;
-use bevy::prelude::*;
+use bevy::{prelude::*, transform::commands};
 use bevy::utils::HashMap;
 use bevy_voxel_world::prelude::*;
 use noise::{HybridMulti, NoiseFn, Perlin};
@@ -15,6 +14,10 @@ impl VoxelWorldConfig for MainWorld {
     fn voxel_lookup_delegate(&self) -> VoxelLookupDelegate {
         Box::new(move |_chunk_pos| get_voxel_fn(false))
     }
+
+    fn init_root(&self, mut commands: Commands, root: Entity) {
+        commands.entity(root).insert(Name::new("main_world"));
+    }
 }
 
 #[derive(Resource, Clone, Default)]
@@ -27,6 +30,10 @@ impl VoxelWorldConfig for PhysicWorld {
 
     fn voxel_lookup_delegate(&self) -> VoxelLookupDelegate {
         Box::new(move |_chunk_pos| get_voxel_fn(true))
+    }
+
+    fn init_root(&self, mut commands: Commands, root: Entity) {
+        commands.entity(root).insert((Name::new("physics_world"), Visibility::Hidden));
     }
 }
 
