@@ -1,14 +1,17 @@
+use std::time::Duration;
+
+use bevy::prelude::*;
 use bevy::utils::HashMap;
-use bevy::{prelude::*, transform::commands};
 use bevy_voxel_world::prelude::*;
 use noise::{HybridMulti, NoiseFn, Perlin};
+use rand::Rng;
 
 #[derive(Resource, Clone, Default)]
 pub struct MainWorld;
 
 impl VoxelWorldConfig for MainWorld {
     fn spawning_distance(&self) -> u32 {
-        20
+        5
     }
 
     fn voxel_lookup_delegate(&self) -> VoxelLookupDelegate {
@@ -23,8 +26,17 @@ impl VoxelWorldConfig for MainWorld {
 pub struct MapPlugin;
 impl Plugin for MapPlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugins(VoxelWorldPlugin::with_config(MainWorld));
+        app.add_plugins(VoxelWorldPlugin::with_config(MainWorld))
+            .add_systems(Startup, setup)
+            .add_systems(Update, random_block_modification);
     }
+}
+
+fn setup(mut commands: Commands) {
+    commands.spawn(RandomTime(Timer::new(
+        Duration::from_millis(1000),
+        TimerMode::Repeating,
+    )));
 }
 
 fn get_voxel_fn(filter_non_solid: bool) -> Box<dyn FnMut(IVec3) -> WorldVoxel + Send + Sync> {
@@ -70,4 +82,38 @@ fn get_voxel_fn(filter_non_solid: bool) -> Box<dyn FnMut(IVec3) -> WorldVoxel + 
             WorldVoxel::Air
         }
     })
+}
+
+#[derive(Component)]
+struct RandomTime(Timer);
+
+fn random_block_modification(
+    mut voxel_world: VoxelWorld<MainWorld>,
+    time: Res<Time>,
+    mut timer: Query<&mut RandomTime>,
+) {
+    let mut timer = timer.single_mut();
+    timer.0.tick(time.delta());
+
+    // if it finished, despawn the bomb
+    if !timer.0.just_finished() {
+        return;
+    }
+
+    let mut rng = rand::thread_rng();
+
+    let x = rng.gen_range(0..10);
+    let z = rng.gen_range(0..10);
+
+    let Some(top_voxel) = voxel_world.get_surface_voxel_at_2d_pos(Vec2::new(x as f32, z as f32))
+    else {
+        return;
+    };
+
+    let y = top_voxel.0.y + 1;
+
+    let pos = IVec3::new(x, y, z);
+
+    println!("Modifying voxel at {:?}", pos);
+    voxel_world.set_voxel(pos, WorldVoxel::Solid(rng.gen_range(0..3)))
 }
