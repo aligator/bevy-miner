@@ -20,6 +20,10 @@ impl VoxelWorldConfig for MainWorld {
     fn voxel_lookup_delegate(&self) -> VoxelLookupDelegate {
         Box::new(move |_chunk_pos| get_voxel_fn())
     }
+
+    fn init_root(&self, mut commands: Commands, root: Entity) {
+        commands.entity(root).insert(Name::new("MainWorld"));
+    }
 }
 
 pub struct MapPlugin;
