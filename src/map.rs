@@ -6,6 +6,9 @@ use bevy_voxel_world::prelude::*;
 use noise::{HybridMulti, NoiseFn, Perlin};
 use rand::Rng;
 
+pub const WATER: u8 = 3;
+pub const GRAS: u8 = 0;
+
 #[derive(Resource, Clone, Default)]
 pub struct MainWorld;
 
@@ -15,11 +18,7 @@ impl VoxelWorldConfig for MainWorld {
     }
 
     fn voxel_lookup_delegate(&self) -> VoxelLookupDelegate {
-        Box::new(move |_chunk_pos| get_voxel_fn(false))
-    }
-
-    fn init_root(&self, mut commands: Commands, root: Entity) {
-        commands.entity(root).insert(Name::new("main_world"));
+        Box::new(move |_chunk_pos| get_voxel_fn())
     }
 }
 
@@ -34,12 +33,12 @@ impl Plugin for MapPlugin {
 
 fn setup(mut commands: Commands) {
     commands.spawn(RandomTime(Timer::new(
-        Duration::from_millis(1000),
+        Duration::from_millis(500),
         TimerMode::Repeating,
     )));
 }
 
-fn get_voxel_fn(filter_non_solid: bool) -> Box<dyn FnMut(IVec3) -> WorldVoxel + Send + Sync> {
+fn get_voxel_fn() -> Box<dyn FnMut(IVec3) -> WorldVoxel + Send + Sync> {
     // Set up some noise to use as the terrain height map
     let mut noise = HybridMulti::<Perlin>::new(1234);
     noise.octaves = 5;
@@ -57,10 +56,7 @@ fn get_voxel_fn(filter_non_solid: bool) -> Box<dyn FnMut(IVec3) -> WorldVoxel + 
         // Sea level
         if pos.y < 1 {
             // Filter water as it is not really solid.
-            if filter_non_solid {
-                return WorldVoxel::Air;
-            }
-            return WorldVoxel::Solid(3);
+            return WorldVoxel::Solid(WATER);
         }
 
         let [x, y, z] = pos.as_dvec3().to_array();
@@ -77,7 +73,7 @@ fn get_voxel_fn(filter_non_solid: bool) -> Box<dyn FnMut(IVec3) -> WorldVoxel + 
 
         if is_ground {
             // Solid voxel of material type 0
-            WorldVoxel::Solid(0)
+            WorldVoxel::Solid(GRAS)
         } else {
             WorldVoxel::Air
         }
@@ -115,5 +111,5 @@ fn random_block_modification(
     let pos = IVec3::new(x, y, z);
 
     println!("Modifying voxel at {:?}", pos);
-    voxel_world.set_voxel(pos, WorldVoxel::Solid(rng.gen_range(0..3)))
+    voxel_world.set_voxel(pos, WorldVoxel::Solid(rng.gen_range(0..4)))
 }

@@ -1116,8 +1116,8 @@ dependencies = [
 
 [[package]]
 name = "bevy_voxel_world"
-version = "0.5.1"
-source = "git+https://github.com/aligator/bevy_voxel_world?branch=experiments#e3ca27de31140919ade442dd4da45891dedc6747"
+version = "0.6.0"
+source = "git+https://github.com/aligator/bevy_voxel_world?branch=expose_chunk#9a2f6c906aedd751db97b133c73309595daa83a6"
 dependencies = [
  "bevy",
  "block-mesh",
