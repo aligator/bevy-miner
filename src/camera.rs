@@ -1,4 +1,4 @@
-use crate::map::{MainWorld, PhysicWorld};
+use crate::map::MainWorld;
 use bevy::pbr::CascadeShadowConfigBuilder;
 use bevy::prelude::*;
 use bevy_voxel_world::prelude::{VoxelWorld, VoxelWorldCamera};
@@ -22,7 +22,6 @@ fn setup_camera(mut commands: Commands) {
         },
         // This tells bevy_voxel_world to use this cameras transform to calculate spawning area
         VoxelWorldCamera::<MainWorld>::default(),
-        VoxelWorldCamera::<PhysicWorld>::default(),
     ));
 
     // Sun

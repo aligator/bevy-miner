@@ -1,5 +1,5 @@
-use bevy::{prelude::*, transform::commands};
 use bevy::utils::HashMap;
+use bevy::{prelude::*, transform::commands};
 use bevy_voxel_world::prelude::*;
 use noise::{HybridMulti, NoiseFn, Perlin};
 
@@ -20,28 +20,10 @@ impl VoxelWorldConfig for MainWorld {
     }
 }
 
-#[derive(Resource, Clone, Default)]
-pub struct PhysicWorld;
-
-impl VoxelWorldConfig for PhysicWorld {
-    fn spawning_distance(&self) -> u32 {
-        5
-    }
-
-    fn voxel_lookup_delegate(&self) -> VoxelLookupDelegate {
-        Box::new(move |_chunk_pos| get_voxel_fn(true))
-    }
-
-    fn init_root(&self, mut commands: Commands, root: Entity) {
-        commands.entity(root).insert((Name::new("physics_world"), Visibility::Hidden));
-    }
-}
-
 pub struct MapPlugin;
 impl Plugin for MapPlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugins(VoxelWorldPlugin::with_config(MainWorld))
-            .add_plugins(VoxelWorldPlugin::with_config(PhysicWorld));
+        app.add_plugins(VoxelWorldPlugin::with_config(MainWorld));
     }
 }
 
