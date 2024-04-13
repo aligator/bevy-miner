@@ -8,8 +8,9 @@ pub struct AssetLoaderPlugin;
 impl Plugin for AssetLoaderPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<SceneAssets>()
-            .add_systems(PreStartup, load_assets);
+          //  .add_systems(PreStartup, load_assets)
+        ;
     }
 }
 
-fn load_assets(mut scene_assets: ResMut<SceneAssets>, asset_server: Res<AssetServer>) {}
+// fn load_assets(mut scene_assets: ResMut<SceneAssets>, asset_server: Res<AssetServer>) {}

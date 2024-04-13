@@ -42,25 +42,6 @@ impl Plugin for MapPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugins(VoxelWorldPlugin::with_config(MainWorld))
             .add_plugins(VoxelWorldPlugin::with_config(PhysicWorld));
-        //  .add_systems(Update, set_camera_to_map);
-    }
-}
-
-fn set_camera_to_map(
-    mut query: Query<&mut Transform, With<VoxelWorldCamera<MainWorld>>>,
-    voxel_world: VoxelWorld<MainWorld>,
-) {
-    for mut transform in query.iter_mut() {
-        let Some(spawn) = voxel_world.get_surface_voxel_at_2d_pos(Vec2::new(0.0, 0.0)) else {
-            return;
-        };
-
-        let Some(look_at) = voxel_world.get_surface_voxel_at_2d_pos(Vec2::new(10.0, 0.0)) else {
-            return;
-        };
-
-        transform.translation = spawn.0.as_vec3() + Vec3::new(0.0, 10.0, 0.0);
-        transform.look_at(look_at.0.as_vec3(), Vec3::Y);
     }
 }
 
