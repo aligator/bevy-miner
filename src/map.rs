@@ -1,10 +1,7 @@
-use std::time::Duration;
-
-use bevy::prelude::*;
 use bevy::utils::HashMap;
+use bevy::{pbr::CascadeShadowConfigBuilder, prelude::*};
 use bevy_voxel_world::prelude::*;
 use noise::{HybridMulti, NoiseFn, Perlin};
-use rand::Rng;
 
 pub const WATER: u8 = 3;
 pub const GRAS: u8 = 0;
@@ -14,7 +11,7 @@ pub struct MainWorld;
 
 impl VoxelWorldConfig for MainWorld {
     fn spawning_distance(&self) -> u32 {
-        5
+        4
     }
 
     fn voxel_lookup_delegate(&self) -> VoxelLookupDelegate {
@@ -30,16 +27,37 @@ pub struct MapPlugin;
 impl Plugin for MapPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugins(VoxelWorldPlugin::with_config(MainWorld))
-            .add_systems(Startup, setup)
-            .add_systems(Update, random_block_modification);
+            .add_systems(PreStartup, setup_surroundings);
     }
 }
 
-fn setup(mut commands: Commands) {
-    commands.spawn(RandomTime(Timer::new(
-        Duration::from_millis(500),
-        TimerMode::Repeating,
-    )));
+fn setup_surroundings(mut commands: Commands) {
+    // camera
+    commands.spawn((
+        Camera3dBundle::default(), // will be replaced later by the player camera.
+        // This tells bevy_voxel_world to use this cameras transform to calculate spawning area
+        VoxelWorldCamera::<MainWorld>::default(),
+    ));
+
+    // Sun
+    let cascade_shadow_config = CascadeShadowConfigBuilder { ..default() }.build();
+    commands.spawn(DirectionalLightBundle {
+        directional_light: DirectionalLight {
+            color: Color::rgb(0.98, 0.95, 0.82),
+            shadows_enabled: true,
+            ..default()
+        },
+        transform: Transform::from_xyz(0.0, 0.0, 0.0)
+            .looking_at(Vec3::new(-0.15, -0.1, 0.15), Vec3::Y),
+        cascade_shadow_config,
+        ..default()
+    });
+
+    // Ambient light, same color as sun
+    commands.insert_resource(AmbientLight {
+        color: Color::rgb(0.98, 0.95, 0.82),
+        brightness: 100.0,
+    });
 }
 
 fn get_voxel_fn() -> Box<dyn FnMut(IVec3) -> WorldVoxel + Send + Sync> {
@@ -82,38 +100,4 @@ fn get_voxel_fn() -> Box<dyn FnMut(IVec3) -> WorldVoxel + Send + Sync> {
             WorldVoxel::Air
         }
     })
-}
-
-#[derive(Component)]
-struct RandomTime(Timer);
-
-fn random_block_modification(
-    mut voxel_world: VoxelWorld<MainWorld>,
-    time: Res<Time>,
-    mut timer: Query<&mut RandomTime>,
-) {
-    let mut timer = timer.single_mut();
-    timer.0.tick(time.delta());
-
-    // if it finished, despawn the bomb
-    if !timer.0.just_finished() {
-        return;
-    }
-
-    let mut rng = rand::thread_rng();
-
-    let x = rng.gen_range(0..10);
-    let z = rng.gen_range(0..10);
-
-    let Some(top_voxel) = voxel_world.get_surface_voxel_at_2d_pos(Vec2::new(x as f32, z as f32))
-    else {
-        return;
-    };
-
-    let y = top_voxel.0.y + 1;
-
-    let pos = IVec3::new(x, y, z);
-
-    println!("Modifying voxel at {:?}", pos);
-    voxel_world.set_voxel(pos, WorldVoxel::Solid(rng.gen_range(0..4)))
 }
