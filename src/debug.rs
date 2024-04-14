@@ -8,7 +8,7 @@ impl Plugin for DebugPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugins(RapierDebugRenderPlugin {
             mode: DebugRenderMode::all()
-               // - DebugRenderMode::COLLIDER_SHAPES
+                - DebugRenderMode::COLLIDER_SHAPES
                 - DebugRenderMode::COLLIDER_AABBS,
             ..default()
         })

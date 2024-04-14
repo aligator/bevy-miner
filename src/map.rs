@@ -11,7 +11,7 @@ pub struct MainWorld;
 
 impl VoxelWorldConfig for MainWorld {
     fn spawning_distance(&self) -> u32 {
-        4
+        20
     }
 
     fn voxel_lookup_delegate(&self) -> VoxelLookupDelegate {
@@ -34,6 +34,7 @@ impl Plugin for MapPlugin {
 fn setup_surroundings(mut commands: Commands) {
     // camera
     commands.spawn((
+        Name::new("Camera"),
         Camera3dBundle::default(), // will be replaced later by the player camera.
         // This tells bevy_voxel_world to use this cameras transform to calculate spawning area
         VoxelWorldCamera::<MainWorld>::default(),
@@ -41,17 +42,20 @@ fn setup_surroundings(mut commands: Commands) {
 
     // Sun
     let cascade_shadow_config = CascadeShadowConfigBuilder { ..default() }.build();
-    commands.spawn(DirectionalLightBundle {
-        directional_light: DirectionalLight {
-            color: Color::rgb(0.98, 0.95, 0.82),
-            shadows_enabled: true,
+    commands.spawn((
+        Name::new("Sun"),
+        DirectionalLightBundle {
+            directional_light: DirectionalLight {
+                color: Color::rgb(0.98, 0.95, 0.82),
+                shadows_enabled: true,
+                ..default()
+            },
+            transform: Transform::from_xyz(0.0, 0.0, 0.0)
+                .looking_at(Vec3::new(-0.15, -0.1, 0.15), Vec3::Y),
+            cascade_shadow_config,
             ..default()
         },
-        transform: Transform::from_xyz(0.0, 0.0, 0.0)
-            .looking_at(Vec3::new(-0.15, -0.1, 0.15), Vec3::Y),
-        cascade_shadow_config,
-        ..default()
-    });
+    ));
 
     // Ambient light, same color as sun
     commands.insert_resource(AmbientLight {

@@ -383,43 +383,11 @@ dependencies = [
  "bevy",
  "bevy-fps-counter",
  "bevy-inspector-egui",
- "bevy-tnua",
- "bevy-tnua-rapier3d",
+ "bevy_fps_controller",
  "bevy_rapier3d",
  "bevy_voxel_world",
  "noise",
  "rand",
-]
-
-[[package]]
-name = "bevy-tnua"
-version = "0.16.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4fdb7fe0e9b2099555dd0b58d53789eb39d049f730a9895dd4c90c35449f19ae"
-dependencies = [
- "bevy",
- "bevy-tnua-physics-integration-layer",
- "thiserror",
-]
-
-[[package]]
-name = "bevy-tnua-physics-integration-layer"
-version = "0.3.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3924097b24a5411d31de920521d0703be1db6d12c67156c7149d194e3e2ddf68"
-dependencies = [
- "bevy",
-]
-
-[[package]]
-name = "bevy-tnua-rapier3d"
-version = "0.5.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e43514d36b103b70f12e9411c78da721928b73a5997422dd568c69e23353cf7a"
-dependencies = [
- "bevy",
- "bevy-tnua-physics-integration-layer",
- "bevy_rapier3d",
 ]
 
 [[package]]
@@ -649,6 +617,16 @@ checksum = "887087a5e522d9f20733a84dd7e6e9ca04cd8fdfac659220ed87d675eebc83a7"
 dependencies = [
  "bevy_macro_utils",
  "encase_derive_impl",
+]
+
+[[package]]
+name = "bevy_fps_controller"
+version = "0.2.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b3f5b752d1e067e31fe27b8bf13d79a836df0d6652dfaa4757d30eaf3db7dfa6"
+dependencies = [
+ "bevy",
+ "bevy_rapier3d",
 ]
 
 [[package]]
